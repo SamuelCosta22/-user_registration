@@ -1,36 +1,45 @@
 import './app.css'
 import Trash from '../assets/lixeira-de-reciclagem.png'
+import api from '../services/api'
+import { useEffect, useState, useRef } from 'react'
 
 function App() {
-  const users = [
-    {
-      id: '12121234',
-      name: 'Samuel',
-      age: 22,
-      email: 'samuel@gmail.com'
-    },
-    {
-      id: '21324343',
-      name: 'Iasmin',
-      age: 23,
-      email: 'iasmin@gmail.com'
-    },
-    {
-      id: '123',
-      name: 'Teste',
-      age: 24,
-      email: 'teste@gmail.com'
-    }
-  ]
+  useEffect(() => {
+    getUsers()
+  }, [])
+
+  const [users, setUsers] = useState([])
+  async function getUsers(){
+    const usersFromAPI = await api.get('/users')
+    setUsers(usersFromAPI.data)
+  }
+
+  const inputName = useRef()
+  const inputAge = useRef()
+  const inputEmail = useRef()
+
+  async function createUsers(){
+    await api.post('/users', {
+      name: inputName.current.value,
+      age: inputAge.current.value,
+      email: inputEmail.current.value
+    })
+    getUsers()
+  }
+
+  async function deleteUsers(id){
+    await api.delete(`/users/${id}`)
+    getUsers()
+  }
 
   return(
     <div className='container'>
       <form>
         <h1>Cadastro de Usuários</h1>
-        <input placeholder='Nome de Usuário' name='name' type='text' />
-        <input placeholder='Idade' name='age' type='number' />
-        <input placeholder='Email' name='email' type='email' />
-        <button type='button'>Cadastrar</button>
+        <input placeholder='Nome de Usuário' name='name' type='text' ref={inputName} />
+        <input placeholder='Idade' name='age' type='number' ref={inputAge} />
+        <input placeholder='Email' name='email' type='email' ref={inputEmail} />
+        <button type='button' onClick={createUsers} >Cadastrar</button>
       </form>
 
       {users.map(user => (
@@ -40,7 +49,7 @@ function App() {
             <p>Idade: <span>{user.age}</span></p>
             <p>Email: <span>{user.email}</span></p>
           </div>
-          <button><img src={Trash} alt="" /></button>
+          <button onClick={() => deleteUsers(user.id)}><img src={Trash} alt="" /></button>
       </div>
       ))}
     </div>
