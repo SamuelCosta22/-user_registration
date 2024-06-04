@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 const app = express()
 app.use(express.json())
-
+0
 app.post('/users', async (req, res) => {
     await prisma.user.create({
         data: {
